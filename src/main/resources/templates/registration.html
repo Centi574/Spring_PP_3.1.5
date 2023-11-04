@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action = "/registration" method="POST">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <label th:for="name">Имя:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label th:for="surname">Фамилия:</label>
+    <input type="text" id="surname" name="surname" required>
+
+    <label th:for="password">Пароль:</label>
+    <input type="text" id="password" name="password" required>
+
+    <button type="submit">Внести данные</button>
+
+</form>
+</body>
+</html>

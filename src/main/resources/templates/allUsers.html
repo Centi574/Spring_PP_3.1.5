@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<h1>Admin Page</h1>
+<div style="float: left; width: 70%;">
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Имя и фамилия</th>
+            <th>ссылка на обновление инфы</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="usr : ${userList}">
+            <tr>
+                <td th:text = "${usr}"></td>
+                <td>
+                    <a th:href="@{/user/{id}(id=${usr.getId()})}" th:text = "Инфо" >user</a>
+                </td>
+            </tr>
+        </th:block>
+
+        </tbody>
+
+    </table>
+
+
+    <br/>
+    <a href="/admin/new">Создать нового пользователя</a>
+</div >
+</body>
+</html>
