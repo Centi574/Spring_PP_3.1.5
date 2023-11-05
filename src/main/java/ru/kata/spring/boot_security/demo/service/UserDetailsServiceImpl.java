@@ -35,12 +35,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByName(username);
+        Optional<User> user = userRepository.findByUsername(username);
 
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Пользователя с таким именем не существует");
         }
-        return new org.springframework.security.core.userdetails.User(user.get().getName(), user.get().getPassword(),
+        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(),
                 mapRolesToAuthorities(user.get().getRoles()));
     }
 
@@ -69,11 +69,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void updateById(User user, int id) {
         User userForUpdate = userRepository.findById(id).orElse(null);
         userForUpdate.setSurname(user.getSurname());
-        userForUpdate.setName(user.getName());
+        userForUpdate.setUsername(user.getUsername());
     }
 
     @Transactional
     public User findByName(String name) {
-        return userRepository.findByName(name).get();
+        return userRepository.findByUsername(name).get();
     }
 }

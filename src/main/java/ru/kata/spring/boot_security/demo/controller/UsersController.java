@@ -33,18 +33,14 @@ public class UsersController {
 
     @GetMapping(value = "/{id}")
     public String showUserById(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
-
-        checkUsersAccess(model, id, authentication);
-
+        checkUsersAccess(id, authentication);
         model.addAttribute("user", userService.getUserById(id));
         return "show";
     }
 
     @GetMapping(value = "/{id}/edit")
     public String editUser(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
-
-        checkUsersAccess(model, id, authentication);
-
+        checkUsersAccess(id, authentication);
         model.addAttribute("user", userService.getUserById(id));
         return "edit";
     }
@@ -52,7 +48,6 @@ public class UsersController {
     @PatchMapping(value = "/{id}")
     public String updateUser(@ModelAttribute("user") User user, @PathVariable(value = "id") int id, Authentication authentication) {
         userService.updateById(user, id);
-
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         if (roles.contains("ROLE_ADMIN")) {
             return "redirect:/admin/allUsers";
@@ -72,11 +67,10 @@ public class UsersController {
         }
     }
 
-    private void checkUsersAccess(Model model, int id, Authentication authentication) {
+    private void checkUsersAccess(int id, Authentication authentication) {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         String name = authentication.getName();
         User user = userService.findByName(name);
-
         if (user.getId() != id && !roles.contains("ROLE_ADMIN")) {
             throw new AccessDeniedException("Access denied");
         }

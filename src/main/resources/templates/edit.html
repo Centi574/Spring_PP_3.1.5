@@ -9,7 +9,7 @@
 <form th:action="@{/user/{id}(id = ${user.getId()})}" th:method="PATCH" th:object="${user}">
 
     <label for="name">Имя: </label>
-    <input type="text" th:field="*{name}" id="name"/>
+    <input type="text" th:field="*{username}" id="name"/>
 
     <label for="surname">Фамилия: </label>
     <input type="text" th:field="*{surname}"  id="surname"/>

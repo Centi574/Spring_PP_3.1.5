@@ -10,13 +10,18 @@
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
         <label th:for="name">Имя:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="username" required>
 
         <label th:for="surname">Фамилия:</label>
         <input type="text" id="surname" name="surname" required>
 
         <label th:for="password">Пароль:</label>
         <input type="text" id="password" name="password" required>
+
+        <label for="role">Select Role:</label>
+        <select id="role" name="roles" multiple="multiple">
+            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.getRole()}">User</option>
+        </select>
 
         <button type="submit">Внести данные</button>
 

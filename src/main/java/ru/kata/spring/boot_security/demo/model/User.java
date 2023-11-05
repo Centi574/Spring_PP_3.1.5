@@ -18,7 +18,7 @@ public class User implements UserDetails {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String username;
 
     @Column(name = "lastname")
     private String surname;
@@ -37,7 +37,12 @@ public class User implements UserDetails {
 
     public User(int id, String name, String surname) {
         this.id = id;
-        this.name = name;
+        this.username = name;
+        this.surname = surname;
+    }
+
+    public User(String name, String surname) {
+        this.username = name;
         this.surname = surname;
     }
 
@@ -51,14 +56,6 @@ public class User implements UserDetails {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getSurname() {
@@ -77,9 +74,13 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
+    public void setUsername(String userName) {
+        this.username = userName;
+    }
+
     @Override
     public String toString() {
-        return name + " " + surname;
+        return username + " " + surname;
     }
 
     @Override
@@ -94,7 +95,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return username;
     }
 
     @Override
