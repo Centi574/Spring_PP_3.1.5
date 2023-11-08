@@ -35,15 +35,17 @@ public class UsersController {
     public String showUserById(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
         checkUsersAccess(id, authentication);
         model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
+        model.addAttribute("userList", userService.getAllUsers());
         return "show";
     }
-
-    @GetMapping(value = "/{id}/edit")
-    public String editUser(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
-        checkUsersAccess(id, authentication);
-        model.addAttribute("user", userService.getUserById(id));
-        return "edit";
-    }
+//
+//    @GetMapping(value = "/{id}/edit")
+//    public String editUser(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
+//        checkUsersAccess(id, authentication);
+//        model.addAttribute("user", userService.getUserById(id));
+//        return "edit";
+//    }
 
     @PatchMapping(value = "/{id}")
     public String updateUser(@ModelAttribute("user") User user, @PathVariable(value = "id") int id, Authentication authentication) {

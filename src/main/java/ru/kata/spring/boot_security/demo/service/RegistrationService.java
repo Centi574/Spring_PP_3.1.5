@@ -44,13 +44,14 @@ public class RegistrationService {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         Set<Role> roleSet = new HashSet<>();
-        for (Integer roleId: roles) {
+        for (Integer roleId : roles) {
             roleSet.add(roleRepository.findById(roleId).get());
         }
         user.setRoles(roleSet);
         userRepository.save(user);
     }
 
+    @Transactional
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }

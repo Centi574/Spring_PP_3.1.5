@@ -1,6 +1,9 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -28,14 +31,18 @@ public class AdminsController {
 
     @GetMapping("/allUsers")
     public String printUserList(ModelMap model) {
-        List<User> userList = userService.getAllUsers();
-        model.addAttribute("userList", userList);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        model.addAttribute("userList", userService.getAllUsers());
+        model.addAttribute("name", name);
         return "allUsers";
     }
 
     @GetMapping(value = "/new")
     public String addUser(@ModelAttribute("user") User user, Model model) {
         model.addAttribute("roles", registrationService.getAllRoles());
+        model.addAttribute("userList" ,userService.getAllUsers());
+        model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
         return "new";
     }
 
