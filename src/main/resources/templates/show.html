@@ -63,7 +63,8 @@
                             <td th:text="${user.getRoles()}"></td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        th:data-target="${'#edit'+user.id}">Edit</button>
+                                        th:data-target="${'#edit'+user.id}">Edit
+                                </button>
                             </td>
                             <td>
                                 <form th:action="@{/user/{id}(id = ${user.getId()})}" th:method="DELETE">
@@ -77,7 +78,8 @@
                          tabindex="-1"
                          role="dialog">
                         <form th:action="@{/user/{id}(id=${user.id})}"
-                              th:method="PATCH">
+                              th:method="PATCH"
+                              th:object="${user}">
                             <div class="modal-dialog modal-dialog-centered"
                                  role="document">
                                 <div class="modal-content">
@@ -106,20 +108,24 @@
                                                        id="editUsername"
                                                        th:value="${user.username}"
                                                        th:name="username">
+                                                <div style="color:red" th:if="${#fields.hasErrors('username')}"
+                                                     th:errors="*{username}">Name error
+                                                </div>
                                             </div>
                                             <div class="form-group text-center font-weight-bolder"
                                                  style="margin: 5px 0; text-align: center">
-                                                <label for="editSurname">
-                                                    Surname </label>
+                                                <label for="editSurname">Surname </label>
                                                 <input class="form-control" type="text"
                                                        id="editSurname"
                                                        th:value="${user.surname}"
                                                        th:name="surname">
+                                                <div style="color:red" th:if="${#fields.hasErrors('surname')}"
+                                                     th:errors="*{surname}">Name error
+                                                </div>
                                             </div>
                                             <div class="form-group text-center font-weight-bolder"
                                                  style="margin: 5px 0; text-align: center">
-                                                <label for="passwordEdit">
-                                                    Password </label>
+                                                <label for="passwordEdit">Password </label>
                                                 <input class="form-control"
                                                        type="password"
                                                        name="password" id="passwordEdit"
