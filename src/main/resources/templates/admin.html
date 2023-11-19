@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+          integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <title></title>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+    <!-- Navbar content -->
+    <span class="navbar-brand" id="navbarBrand">Sticky top</span>
+    <a href="/logout" class="btn btn-dark">Logout</a>
+</nav>
+
+<!--Страница Админа-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2" id="usersNavigation">
+
+        </div>
+        <!--        Инфа доступная Админу-->
+        <div class="col-md-10 bg-light vh-100 ">
+            <h1>Admin Page</h1>
+            <div style="float: left; width: 70%;">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#allUsers" id="allUsers">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#createUserForm" id="newUserLink">New User</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <table class="table table-hover bg-white table-block" id="userTable">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>ID</th>
+                        <th>Role</th>
+                        <th>View User Page</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+                <!--                Код формы для добавления User-->
+                <div class="card" id="createUserForm" style="display: none">
+                    <div class="card-header">
+                        Add new User
+                    </div>
+                    <div class="card-body">
+                        <form class="offset-md-4 col-md-4 mt-1 mb-1"
+                              th:align="center">
+
+                            <div class="form-group text-center font-weight-bolder">
+                                <label for="newUsername">Username:</label>
+                                <input type="text" class="form-control" size="5" id="newUsername" name="username"
+                                       required>
+                            </div>
+
+                            <div class="form-group text-center font-weight-bolder">
+                                <label for="newSurname">Surname:</label>
+                                <input type="text" class="form-control" size="5" id="newSurname" name="surname"
+                                       required>
+                            </div>
+
+                            <div class="form-group text-center font-weight-bolder">
+                                <label for="newPassword">Password:</label>
+                                <input type="text" class="form-control" size="5" id="newPassword" name="password"
+                                       required>
+                            </div>
+
+                            <div class="form-group text-center font-weight-bolder">
+                                <label for="newRole">Select Role:</label>
+                                <select id="newRole" name="roles" multiple="multiple" class="form-control" size="5">
+
+                                </select>
+                            </div>
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary" id="newSub">Внести данные</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+                <!--                таблица с инфой о Юзере-->
+                <table class="table table-hover bg-white table-block" id="userInfoTable" style="display: none">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>ID</th>
+                        <th>Role</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+
+            </div>
+
+
+            <!--            Модальное окно для редактирования-->
+            <div class="modal fade" id="EditUserForm" style="display: none"
+                 aria-labelledby="editModalLabel" aria-hidden="true"
+                 tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog modal-dialog-centered"
+                     role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body"
+                             style="display: flex; align-items: center; justify-content: center">
+                            <div style="width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="editId"> Id </label>
+                                    <input class="form-control" type="text"
+                                           id="editId"
+                                           name="userID" readonly>
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="editUsername"> Username </label>
+                                    <input class="form-control" type="text"
+                                           id="editUsername"
+                                           name="username">
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="editSurname">Surname </label>
+                                    <input class="form-control" type="text"
+                                           id="editSurname"
+                                           name="surname">
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="passwordEdit">Password </label>
+                                    <input class="form-control"
+                                           type="password"
+                                           name="password" id="passwordEdit">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-dismiss="modal" id="editClose">Close
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-primary" id="editSub">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="DeleteUserForm" style="display: none"
+                 aria-labelledby="editModalLabel" aria-hidden="true"
+                 tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog modal-dialog-centered"
+                     role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="DeleteModalLabel">Delete User</h5>
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body"
+                             style="display: flex; align-items: center; justify-content: center">
+                            <div style="width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="deleteId"> Id </label>
+                                    <input class="form-control" type="text"
+                                           id="deleteId"
+                                           name="userID" readonly>
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="deleteUsername"> Username </label>
+                                    <input class="form-control" type="text"
+                                           id="deleteUsername"
+                                           name="username" readonly>
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="deleteSurname">Surname </label>
+                                    <input class="form-control" type="text"
+                                           id="deleteSurname"
+                                           name="surname" readonly>
+                                </div>
+                                <div class="form-group text-center font-weight-bolder"
+                                     style="margin: 5px 0; text-align: center">
+                                    <label for="passwordDelete">Password </label>
+                                    <input class="form-control"
+                                           type="password"
+                                           name="password" id="passwordDelete" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-dismiss="modal">Close
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-primary" id="deleteSub">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                Пробный код, возможно удаление выше-->
+            <script src="/script.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const newRoleSelect = document.getElementById('newRole');
+
+        // Загрузка списка ролей с сервера
+        fetch('/api/admin/roles')
+            .then(response => response.json())
+            .then(roles => {
+                // Добавление каждой роли в выпадающий список
+                roles.forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role.id;
+                    option.textContent = role.role;
+                    newRoleSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching roles:', error));
+    });
+</script>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+</body>

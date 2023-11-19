@@ -14,7 +14,7 @@
 <body>
 <nav class="navbar navbar-dark bg-dark">
     <!-- Navbar content -->
-    <span class="navbar-brand" th:text="${user.username}">SITE NAME</span>
+    <span class="navbar-brand" text="username">SITE NAME</span>
     <a href="/logout" class="btn btn-dark">Logout</a>
 </nav>
 <div class="jumbotron bg-wight ">
@@ -24,6 +24,6 @@
 </div>
 <div class="form-group text-center font-weight-bolder"
      style="margin: 5px 0; text-align: center">
-    <a th:href="@{/user/{id}(id=${user.id})}" class="btn btn-lg btn-primary">Watch info</a>
+<!--    <a th:href="@{/user/{id}(id=${user.id})}" class="btn btn-lg btn-primary">Watch info</a>-->
 </div>
 </body>

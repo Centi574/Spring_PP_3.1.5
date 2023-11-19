@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -14,8 +15,8 @@ import ru.kata.spring.boot_security.demo.service.UserDetailsServiceImpl;
 import javax.validation.Valid;
 import java.util.Set;
 
-@Controller
-@RequestMapping(value = "/user")
+@RestController
+@RequestMapping(value = "/api/user")
 public class UsersController {
 
     private final UserDetailsServiceImpl userService;
@@ -26,49 +27,28 @@ public class UsersController {
     }
 
     @GetMapping()
-    public String defaultUserPage(Model model, Authentication authentication) {
-        String name = authentication.getName();
-        User user = userService.findByName(name);
-        model.addAttribute("user", user);
-        return "user";
+    public ResponseEntity<User> defaultUserPage() {
+        User authenticatedUser = userService.getAuthenticatedUser();
+        return ResponseEntity.ok(authenticatedUser);
     }
 
     @GetMapping(value = "/{id}")
-    public String showUserById(Model model, @PathVariable(value = "id") int id, Authentication authentication) {
-        checkUsersAccess(id, authentication);
-        model.addAttribute("user", userService.getUserById(id));
-        model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
-        model.addAttribute("userList", userService.getAllUsers());
-        return "show";
+    public ResponseEntity<User> showUserById(@PathVariable(value = "id") int id) {
+        User userById = userService.getUserById(id);
+        return ResponseEntity.ok(userById);
     }
 
-    @PatchMapping(value = "/{id}")
-    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                             @PathVariable(value = "id") int id,
-                             Authentication authentication, Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
-            model.addAttribute("userList", userService.getAllUsers());
-            return "show";
-        }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable(value = "id") int id) {
         userService.updateById(user, id);
-        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-        if (roles.contains("ROLE_ADMIN")) {
-            return "redirect:/admin/allUsers";
-        } else {
-            return "redirect:/user";
-        }
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
-    public String removeUserById(@PathVariable(value = "id") int id, Authentication authentication) {
+    public ResponseEntity<User> removeUserById(@PathVariable(value = "id") int id) {
+        User userToDelete = userService.getUserById(id);
         userService.removeUser(id);
-        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-        if (roles.contains("ROLE_ADMIN")) {
-            return "redirect:/admin/allUsers";
-        } else {
-            return "redirect:/";
-        }
+        return ResponseEntity.ok(userToDelete);
     }
 
     private void checkUsersAccess(int id, Authentication authentication) {

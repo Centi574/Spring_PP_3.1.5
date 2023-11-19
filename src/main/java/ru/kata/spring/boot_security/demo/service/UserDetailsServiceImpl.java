@@ -22,7 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class
+UserDetailsServiceImpl implements UserDetailsService {
 
     @PersistenceContext
     private EntityManager entityManager;

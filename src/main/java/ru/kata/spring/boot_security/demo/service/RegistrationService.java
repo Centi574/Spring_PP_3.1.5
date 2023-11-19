@@ -31,16 +31,16 @@ public class RegistrationService {
     }
 
     @Transactional
-    public void performRegistration(User user) {
+    public User performRegistration(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         Role roleUser = roleRepository.findByRole("ROLE_USER");
         user.setRoles(Collections.singleton(roleUser));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Transactional
-    public void saveUser(User user, Integer[] roles) {
+    public User saveUser(User user, Set<Integer> roles) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         Set<Role> roleSet = new HashSet<>();
@@ -48,7 +48,7 @@ public class RegistrationService {
             roleSet.add(roleRepository.findById(roleId).get());
         }
         user.setRoles(roleSet);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Transactional

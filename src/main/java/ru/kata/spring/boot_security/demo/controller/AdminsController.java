@@ -1,24 +1,23 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.dto.UserRequestDTO;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RegistrationService;
 import ru.kata.spring.boot_security.demo.service.UserDetailsServiceImpl;
 
-import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
-@Controller
-@RequestMapping(value = "/admin")
+@RestController
+@RequestMapping(value = "/api/admin")
 public class AdminsController {
 
     private final RegistrationService registrationService;
@@ -31,33 +30,33 @@ public class AdminsController {
         this.userService = userService;
     }
 
-    @GetMapping("/allUsers")
-    public String printUserList(ModelMap model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String name = authentication.getName();
-        model.addAttribute("userList", userService.getAllUsers());
-        model.addAttribute("name", name);
-        return "allUsers";
+    @CrossOrigin
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> printUserList() {
+        List<User> allUsers = userService.getAllUsers();
+        return ResponseEntity.ok(allUsers);
     }
 
-    @GetMapping(value = "/new")
-    public String addUser(@ModelAttribute("user") User user, Model model) {
-        model.addAttribute("roles", registrationService.getAllRoles());
-        model.addAttribute("userList", userService.getAllUsers());
-        model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
-        return "new";
+    @GetMapping("/users/authenticatedUser")
+    public ResponseEntity<User> printAuthenticatedUser() {
+        User user = userService.getAuthenticatedUser();
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping()
-    public String saveUserByController(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                                       @RequestParam Integer[] roles, Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("roles", registrationService.getAllRoles());
-            model.addAttribute("userList", userService.getAllUsers());
-            model.addAttribute("authenticatedUser", userService.getAuthenticatedUser());
-            return "new";
-        }
-        registrationService.saveUser(user, roles);
-        return "redirect:/admin/allUsers";
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> printAllRoles() {
+        List<Role> allRoles = registrationService.getAllRoles();
+        return ResponseEntity.ok(allRoles);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<User> addUser(@RequestBody UserRequestDTO userRequestDTO) {
+        User newUser = new User();
+        newUser.setUsername(userRequestDTO.getUsername());
+        newUser.setSurname(userRequestDTO.getSurname());
+        newUser.setPassword(userRequestDTO.getPassword());
+
+        User addedUser = registrationService.saveUser(newUser, userRequestDTO.getRoles());
+        return ResponseEntity.ok(addedUser);
     }
 }
