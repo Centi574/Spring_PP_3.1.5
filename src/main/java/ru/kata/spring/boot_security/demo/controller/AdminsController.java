@@ -1,20 +1,21 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.dto.UserRequestDTO;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RegistrationService;
 import ru.kata.spring.boot_security.demo.service.UserDetailsServiceImpl;
+import ru.kata.spring.boot_security.demo.util.ErrorResponse;
+import ru.kata.spring.boot_security.demo.util.UserValidationException;
 
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/api/admin")
@@ -30,7 +31,6 @@ public class AdminsController {
         this.userService = userService;
     }
 
-    @CrossOrigin
     @GetMapping("/users")
     public ResponseEntity<List<User>> printUserList() {
         List<User> allUsers = userService.getAllUsers();
@@ -50,13 +50,26 @@ public class AdminsController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> addUser(@RequestBody UserRequestDTO userRequestDTO) {
-        User newUser = new User();
-        newUser.setUsername(userRequestDTO.getUsername());
-        newUser.setSurname(userRequestDTO.getSurname());
-        newUser.setPassword(userRequestDTO.getPassword());
+    public ResponseEntity<User> addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
 
-        User addedUser = registrationService.saveUser(newUser, userRequestDTO.getRoles());
+        if (bindingResult.hasErrors()) {
+
+            List<String> errorsList = new ArrayList<>();
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+
+            for (FieldError error: fieldErrors) {
+                errorsList.add(error.getDefaultMessage());
+            }
+            throw new UserValidationException(errorsList);
+        }
+
+        User addedUser = registrationService.saveUser(user);
         return ResponseEntity.ok(addedUser);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<ErrorResponse> handleException(UserValidationException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessageList());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

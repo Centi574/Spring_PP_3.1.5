@@ -25,29 +25,36 @@ function showAdminPage() {
                 row.insertCell(4).textContent = 'Some additional info';
 
                 // Добавление кнопок, ссылающих на странички юзеров
-                const link = document.createElement('a');
-                link.id = `userLink-${user.id}`;
-                link.classList.add('btn', 'btn-primary', 'btn-block', 'mt-2');
-                link.textContent = user.username + ' ' + user.surname;
-
-                link.addEventListener('click', () => {
-                    fetch(`/api/user/${user.id}`)
-                        .then(response => response.json())
-                        .then(async userInfo => {
-                            // Отражение инфы об отдельном пользователе
-                            await showUserInfoTable(userInfo)
-                        })
-                })
+                const link = linkToUserInfo(user)
                 container.appendChild(link);
             });
         })
         .catch(error => console.error('Error fetching users:', error));
 }
 
+function linkToUserInfo(user) {
+    // Добавление кнопок, ссылающих на странички юзеров
+    console.log('запустился метод linkToUserInfo');
+    const link = document.createElement('a');
+    link.id = `userLink-${user.id}`;
+    link.classList.add('btn', 'btn-primary', 'btn-block', 'mt-2');
+    link.textContent = user.username + ' ' + user.surname;
+
+    link.addEventListener('click', () => {
+        fetch(`/api/user/${user.id}`)
+            .then(response => response.json())
+            .then(async userInfo => {
+                // Отражение инфы об отдельном пользователе
+                await showUserInfoTable(userInfo)
+            })
+    })
+    return link;
+}
+
 //===========================================================================
 // тут использовать данные аутентифицированного пользователя.
 // TODO
-fetch('/api/user/2')
+fetch('/api/admin/users/authenticatedUser')
     .then(response => response.json())
     .then(user => {
         const navbarElement = document.getElementById('navbarBrand');
@@ -83,6 +90,8 @@ function fillDeleteForm(user) {
     editedUsername.value = user.username;
     editedSurname.value = user.surname;
     editedPassword.value = user.password;
+
+    console.log('fillDeleteUserForm срабатывает для Юзера с ID : ' + user.id);
 }
 
 function saveChanges() {
@@ -114,14 +123,18 @@ function saveChanges() {
         })
 }
 
-function addUser() {
+async function addUser() {
 
     const newUsername = document.getElementById('newUsername').value;
     const newSurname = document.getElementById('newSurname').value;
     const newPassword = document.getElementById('newPassword').value;
 
-    const selectedRoles = Array.from(document.getElementById('newRole').selectedOptions)
-        .map(option => parseInt(option.value));
+    const selectedRoles = Array.from(document.getElementById('newRole').selectedOptions).map(option => {
+        return {
+            id: parseInt(option.value),
+            role: option.textContent
+        };
+    });
 
     const newUser = {
         username: newUsername,
@@ -129,45 +142,52 @@ function addUser() {
         password: newPassword,
         roles: selectedRoles
     };
-    console.log('New user created: ' + newUser)
-    fetch(`/api/admin/create`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newUser),
-    })
-        .then(response => response.json())
-        .then(addedUser => {
-            console.log('Created user added to DB. User : ', addedUser);
-            const tableBody = document.querySelector('#userTable tbody');
+    console.log('New user created: ' + newUser.username)
 
-            const row = tableBody.insertRow()
-            row.id = `userRow-${addedUser.id}`;
-            row.insertCell(0).textContent = addedUser.username;
-            row.insertCell(1).textContent = addedUser.surname;
-            row.insertCell(2).textContent = addedUser.id;
+    try {
+        const response = await fetch(`/api/admin/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser),
+        });
 
-            const roles = addedUser.roles.map(roleObject => roleObject.role).join(', ');
-            row.insertCell(3).textContent = roles;
+        if (!response.ok) {
+            throw new Error('Failed to create user');
+        }
 
-            updateListUserTable(addedUser.id);
+        const addedUser = await response.json();
+        console.log('Created user added to DB. User: ', addedUser);
+        const tableBody = document.querySelector('#userTable tbody');
 
-            const container = document.getElementById('usersNavigation');
+        const row = tableBody.insertRow()
+        row.id = `userRow-${addedUser.id}`;
+        row.insertCell(0).textContent = addedUser.username;
+        row.insertCell(1).textContent = addedUser.surname;
+        row.insertCell(2).textContent = addedUser.id;
 
-            const link = document.createElement('a');
-            link.id = `userLink-${addedUser.id}`;
-            link.classList.add('btn', 'btn-primary', 'btn-block', 'mt-2');
-            link.textContent = addedUser.username + ' ' + addedUser.surname;
+        const roles = addedUser.roles.map(roleObject => roleObject.role).join(', ');
+        row.insertCell(3).textContent = roles;
+        row.insertCell(4).textContent = 'Some additional info';
 
-            container.appendChild(link);
+        console.log('Обновили таблицу, добавили новую строку для пользователя ' + addedUser);
 
-            showUserList();
-        })
+        const container = document.getElementById('usersNavigation');
 
+        const link = linkToUserInfo(addedUser);
 
+        container.appendChild(link);
+
+        showUserList()
+
+        console.log('New User ADDED')
+    } catch (error) {
+        console.error('Error creating user:', error);
+    }
 }
 
+// Срабатывает при нажатии кнопки для подтверждения удаления
 async function deleteUser(user) {
     try {
         const response = await fetch(`/api/user/${user.id}`, {
@@ -242,30 +262,8 @@ function updateUserLink(id, username, surname) {
     tableRow.cells[1].textContent = surname;
 }
 
-function updateListUserTable(id) {
-    const userTable = document.getElementById('userTable');
-    const tbody = userTable.querySelector('tbody');
-
-    fetch(`/api/user/${id}`)
-        .then(response => response.json())
-        .then(user => {
-            const row = `<tr>
-                                <td>${user.username}</td>
-                                <td>${user.surname}</td>
-                                <td>${user.id}</td>
-                                <td>${user.roles.map(roleObject => roleObject.role).join(', ')}</td>
-                                <td>Some additional info</td>
-                            </tr>`;
-
-            tbody.innerHTML += row;
-
-            userTable.style.display = 'table';
-            document.getElementById('createUserForm').style.display = 'none';
-        })
-        .catch(error => console.error('Error fetching user data:', error));
-}
-
 function showUserInfoTable(user) {
+    console.log('showUserInfoTable метод поюзеру: ' + user.id + ' ' +user.username);
     const userInfoTable = document.getElementById('userInfoTable');
     const tbody = userInfoTable.querySelector('tbody');
 
@@ -338,11 +336,22 @@ function showCreateUserForm() {
 
     document.getElementById('userInfoTable').style.display = 'none';
 
-    const newSubBtn = document.getElementById('newSub');
-    newSubBtn.addEventListener('click', () => {
-        addUser();
-    })
+    const newUsername = document.getElementById('newUsername');
+    const newSurname = document.getElementById('newSurname');
+    const newPassword = document.getElementById('newPassword');
+
+    newUsername.value = '';
+    newSurname.value = '';
+    newPassword.value = '';
 }
+
+const newSubBtn = document.getElementById('newSub');
+
+newSubBtn.addEventListener('click', (event) => {
+    // чтобы не переходили автоматически на начальную страницу
+    event.preventDefault()
+    addUser();
+});
 
 function showUserList() {
     // Скрываем форму создания нового пользователя
@@ -353,11 +362,6 @@ function showUserList() {
     document.getElementById('userInfoTable').style.display = 'none';
 }
 
-//eventlistener для обработки запроса при нажатии на кнопку
-document.addEventListener('DOMContentLoaded', () => {
-
     document.getElementById('allUsers').addEventListener('click', showUserList);
-
     // Обработчик события для кнопки "Создать пользователя"
     document.getElementById('newUserLink').addEventListener('click', showCreateUserForm);
-});

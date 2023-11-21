@@ -2,6 +2,8 @@ package ru.kata.spring.boot_security.demo.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,18 +24,19 @@ public class User implements UserDetails {
 
     @Column(name = "name")
     @NotEmpty(message = "Name should not be empty")
-    @Size(min = 2, max = 30, message = "Size should be longer than 2 and not longer than 30")
+    @Size(min = 2, max = 30, message = "Username should be longer than 2 and not longer than 30")
     private String username;
 
     @Column(name = "lastname")
-    @NotEmpty(message = "Name should not be empty")
-    @Size(min = 2, max = 30, message = "Size should be longer than 2 and not longer than 30")
+    @NotEmpty(message = "Surname should not be empty")
+    @Size(min = 2, max = 30, message = "Surname should be longer than 2 and not longer than 30")
     private String surname;
 
     @Column(name = "password")
+    @NotEmpty(message = "Password should not be empty")
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany (cascade = {CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))

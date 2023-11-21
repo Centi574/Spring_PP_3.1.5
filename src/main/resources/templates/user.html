@@ -12,18 +12,192 @@
     <title>Spring Security Example</title>
 </head>
 <body>
+
+
 <nav class="navbar navbar-dark bg-dark">
     <!-- Navbar content -->
-    <span class="navbar-brand" text="username">SITE NAME</span>
+    <span class="navbar-brand" text="username" id="navbar_username">SITE NAME</span>
     <a href="/logout" class="btn btn-dark">Logout</a>
 </nav>
-<div class="jumbotron bg-wight ">
-    <h1 class="display-5 d-flex align-items-center justify-content-center">User, welcome spring boot security page!</h1>
-    <p class="lead d-block d-flex align-items-center justify-content-center">Press "Watch info" button to see full
-        information about profile</p>
+
+<div id="welcome_page">
+    <div class="jumbotron bg-wight " id="welcome_message">
+        <h1 class="display-5 d-flex align-items-center justify-content-center">Welcome spring boot security page!</h1>
+        <p class="lead d-block d-flex align-items-center justify-content-center">Press "Watch info" button to see full
+            information about profile</p>
+    </div>
+    <div class="form-group text-center font-weight-bolder"
+         style="margin: 5px 0; text-align: center" id="watch_info_btn">
+        <!--    <a th:href="@{/user/{id}(id=${user.id})}" class="btn btn-lg btn-primary">Watch info</a>-->
+    </div>
 </div>
-<div class="form-group text-center font-weight-bolder"
-     style="margin: 5px 0; text-align: center">
-<!--    <a th:href="@{/user/{id}(id=${user.id})}" class="btn btn-lg btn-primary">Watch info</a>-->
+
+<div class="container-fluid" id="user_interface">
+
+    <div class="row">
+        <div class="col-md-2" id="usersNavigation">
+
+        </div>
+        <!--                таблица с инфой о Юзере-->
+        <div class="col-md-10 bg-light vh-100 ">
+            <h1>User Page</h1>
+
+            <div style="float: left; width: 70%;">
+                <table class="table table-hover bg-white table-block" id="userInfoTable" style="display: none">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>ID</th>
+                        <th>Role</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+                <!--            Модальное окно для редактирования-->
+                <div class="modal fade" id="EditUserForm" style="display: none"
+                     aria-labelledby="editModalLabel" aria-hidden="true"
+                     tabindex="-1"
+                     role="dialog">
+                    <div class="modal-dialog modal-dialog-centered"
+                         role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                                <button type="button" class="close"
+                                        data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body"
+                                 style="display: flex; align-items: center; justify-content: center">
+                                <div style="width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="editId"> Id </label>
+                                        <input class="form-control" type="text"
+                                               id="editId"
+                                               name="userID" readonly>
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="editUsername"> Username </label>
+                                        <input class="form-control" type="text"
+                                               id="editUsername"
+                                               name="username">
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="editSurname">Surname </label>
+                                        <input class="form-control" type="text"
+                                               id="editSurname"
+                                               name="surname">
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="passwordEdit">Password </label>
+                                        <input class="form-control"
+                                               type="password"
+                                               name="password" id="passwordEdit">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        data-dismiss="modal" id="editClose">Close
+                                </button>
+                                <button type="submit"
+                                        class="btn btn-primary" id="editSub">
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="DeleteUserForm" style="display: none"
+                     aria-labelledby="editModalLabel" aria-hidden="true"
+                     tabindex="-1"
+                     role="dialog">
+                    <div class="modal-dialog modal-dialog-centered"
+                         role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="DeleteModalLabel">Delete User</h5>
+                                <button type="button" class="close"
+                                        data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body"
+                                 style="display: flex; align-items: center; justify-content: center">
+                                <div style="width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: center">
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="deleteId"> Id </label>
+                                        <input class="form-control" type="text"
+                                               id="deleteId"
+                                               name="userID" readonly>
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="deleteUsername"> Username </label>
+                                        <input class="form-control" type="text"
+                                               id="deleteUsername"
+                                               name="username" readonly>
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="deleteSurname">Surname </label>
+                                        <input class="form-control" type="text"
+                                               id="deleteSurname"
+                                               name="surname" readonly>
+                                    </div>
+                                    <div class="form-group text-center font-weight-bolder"
+                                         style="margin: 5px 0; text-align: center">
+                                        <label for="passwordDelete">Password </label>
+                                        <input class="form-control"
+                                               type="password"
+                                               name="password" id="passwordDelete" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button"
+                                        class="btn btn-secondary"
+                                        data-dismiss="modal">Close
+                                </button>
+                                <button type="submit"
+                                        class="btn btn-primary" id="deleteSub">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="/user_script.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
 </body>

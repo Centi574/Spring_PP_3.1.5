@@ -40,14 +40,9 @@ public class RegistrationService {
     }
 
     @Transactional
-    public User saveUser(User user, Set<Integer> roles) {
+    public User saveUser(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        Set<Role> roleSet = new HashSet<>();
-        for (Integer roleId : roles) {
-            roleSet.add(roleRepository.findById(roleId).get());
-        }
-        user.setRoles(roleSet);
         return userRepository.save(user);
     }
 
