@@ -1,6 +1,3 @@
-// script.js
-
-//===========================================================================
 
 showAdminPage();
 
@@ -189,8 +186,20 @@ async function addUser() {
 
 // Срабатывает при нажатии кнопки для подтверждения удаления
 async function deleteUser(user) {
+    const idForDeleteUser = document.getElementById('deleteId').value;
+    const deleteUsername = document.getElementById('deleteUsername').value;
+    const deleteSurname = document.getElementById('deleteSurname').value;
+    const deletePassword = document.getElementById('passwordDelete').value;
+
+    const deleteUser = {
+        id: idForDeleteUser,
+        username: deleteUsername,
+        surname: deleteSurname,
+        password: deletePassword
+    }
+
     try {
-        const response = await fetch(`/api/user/${user.id}`, {
+        const response = await fetch(`/api/user/${deleteUser.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -292,9 +301,8 @@ function showUserInfoTable(user) {
     editButton.addEventListener('click', () => {
         // Показываем модальное окно Edit и заполняем форму
         document.getElementById('EditUserForm').style.display = 'block';
-
         fillEditForm(user);
-
+        fillDeleteForm(user);
         console.log('Edit button clicked for user ID:', user.id);
     });
 
@@ -305,24 +313,19 @@ function showUserInfoTable(user) {
     const deleteButton = tbody.querySelector('.deleteBtn');
     const deleteSub = document.getElementById('deleteSub');
 
-    // Удаляем существующие обработчики событий, если они есть
-    deleteButton.removeEventListener('click', deleteButtonClickHandler);
-    deleteSub.removeEventListener('click', deleteSubClickHandler);
-
-    // Добавляем новые обработчики событий
-    deleteButton.addEventListener('click', deleteButtonClickHandler);
-    deleteSub.addEventListener('click', deleteSubClickHandler);
-
-    function deleteButtonClickHandler() {
+    deleteButton.addEventListener('click', () => {
         document.getElementById('DeleteUserForm').style.display = 'block';
+        fillEditForm(user);
         fillDeleteForm(user);
         console.log('Delete button for user by ID', user.id);
-    }
+    })
 
-    async function deleteSubClickHandler() {
-        await deleteUser(user);
-        console.log('Deletion submit of user : ', user);
-    }
+    deleteSub.addEventListener('click', deleteSubClickHandler);
+}
+
+async function deleteSubClickHandler() {
+    await deleteUser();
+    console.log('Deletion submit of user');
 }
 
 //===========================================================================
