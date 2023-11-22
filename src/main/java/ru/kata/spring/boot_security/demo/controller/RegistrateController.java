@@ -1,18 +1,24 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.RegistrationService;
+import ru.kata.spring.boot_security.demo.util.ErrorResponse;
+import ru.kata.spring.boot_security.demo.util.UserValidationException;
 
-@Controller
-@RequestMapping("/registration")
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/registration")
 public class RegistrateController {
 
     private final RegistrationService registrationService;
@@ -22,25 +28,23 @@ public class RegistrateController {
         this.registrationService = registrationService;
     }
 
-    @GetMapping()
-    public String registrationPage(@ModelAttribute("user") User user) {
-        return "registration";
+    @PostMapping("/new")
+    public ResponseEntity<String> register(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = new ArrayList<>();
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            for (FieldError error : fieldErrors) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+            throw new UserValidationException(errorMessages);
+        }
+        registrationService.performRegistration(user);
+        return ResponseEntity.ok("Registration was performed");
     }
 
-    @PostMapping()
-    public String register(@ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("registrationError", "Ошибка валидации. Пожалуйста, проверьте введенные данные.");
-            return "registration";
-        }
-        try {
-            registrationService.performRegistration(user);
-            model.addAttribute("successRegistration", "Регистрация прошла успешно");
-            return "redirect:/login";
-        } catch (Exception e) {
-            model.addAttribute("registrationError", "Ошибка при регистрации");
-            return "registration";
-        }
+    @ExceptionHandler
+    private ResponseEntity<ErrorResponse> handleException (UserValidationException e) {
+        ErrorResponse response = new ErrorResponse(e.getMessageList());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

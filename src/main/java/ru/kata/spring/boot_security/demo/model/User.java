@@ -23,7 +23,7 @@ public class User implements UserDetails {
     private int id;
 
     @Column(name = "name")
-    @NotEmpty(message = "Name should not be empty")
+    @NotEmpty(message = "Username should not be empty")
     @Size(min = 2, max = 30, message = "Username should be longer than 2 and not longer than 30")
     private String username;
 
