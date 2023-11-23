@@ -231,11 +231,8 @@ async function deleteUser(user) {
             throw new Error('Failed to delete user');
         }
 
-        const deletedUser = await response.json();
-        console.log('User deleted', deletedUser);
-
-        const link = document.getElementById(`userLink-${deletedUser.id}`);
-        const tableRow = document.getElementById(`userRow-${deletedUser.id}`);
+        const link = document.getElementById(`userLink-${idForDeleteUser}`);
+        const tableRow = document.getElementById(`userRow-${idForDeleteUser}`);
 
         if (link && tableRow) {
             link.remove();

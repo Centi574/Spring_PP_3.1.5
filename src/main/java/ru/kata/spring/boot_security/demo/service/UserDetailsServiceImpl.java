@@ -64,7 +64,6 @@ UserDetailsServiceImpl implements UserDetailsService {
 
     @Transactional
     public void removeUser(int id) {
-        entityManager.createNativeQuery("DELETE FROM users_roles WHERE user_id =" + id).executeUpdate();
         userRepository.deleteById(id);
     }
 

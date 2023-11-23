@@ -57,10 +57,9 @@ public class UsersController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> removeUserById(@PathVariable(value = "id") int id) {
-        User userToDelete = userService.getUserById(id);
+    public ResponseEntity<HttpStatus> removeUserById(@PathVariable(value = "id") int id) {
         userService.removeUser(id);
-        return ResponseEntity.ok(userToDelete);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @ExceptionHandler

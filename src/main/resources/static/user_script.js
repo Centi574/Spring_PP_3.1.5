@@ -171,11 +171,8 @@ async function deleteUser(user) {
             throw new Error('Failed to delete user');
         }
 
-        const deletedUser = await response.json();
-        console.log('User deleted', deletedUser);
-
-        const link = document.getElementById(`userLink-${deletedUser.id}`);
-        const tableRow = document.getElementById(`userRow-${deletedUser.id}`);
+        const link = document.getElementById(`userLink-${user.id}`);
+        const tableRow = document.getElementById(`userRow-${user.id}`);
 
         if (link && tableRow) {
             link.remove();
@@ -191,7 +188,7 @@ async function deleteUser(user) {
     }
 
     $('#DeleteUserForm').modal('hide');
-    // showUserList();
+
     window.location.href = "/";
 }
 

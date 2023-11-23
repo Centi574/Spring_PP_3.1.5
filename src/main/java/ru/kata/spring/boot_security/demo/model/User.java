@@ -36,7 +36,7 @@ public class User implements UserDetails {
     @NotEmpty(message = "Password should not be empty")
     private String password;
 
-    @ManyToMany (cascade = {CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @ManyToMany (fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
