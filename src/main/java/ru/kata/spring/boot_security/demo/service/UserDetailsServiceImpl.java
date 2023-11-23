@@ -44,11 +44,7 @@ UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Пользователя с таким именем не существует");
         }
         return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(),
-                mapRolesToAuthorities(user.get().getRoles()));
-    }
-
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
+                user.get().getRoles());
     }
 
     @Transactional(readOnly = true)
