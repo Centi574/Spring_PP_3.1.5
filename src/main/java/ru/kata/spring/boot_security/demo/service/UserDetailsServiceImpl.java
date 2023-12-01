@@ -10,17 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class
-UserDetailsServiceImpl implements UserDetailsService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -37,8 +33,7 @@ UserDetailsServiceImpl implements UserDetailsService {
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Пользователя с таким именем не существует");
         }
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(),
-                user.get().getRoles());
+        return user.get();
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +44,7 @@ UserDetailsServiceImpl implements UserDetailsService {
     @Transactional(readOnly = true)
     public User getUserById(int id) {
         Optional<User> byId = userRepository.findById(id);
-        return byId.orElse(null);
+        return byId.orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Transactional
@@ -59,14 +54,9 @@ UserDetailsServiceImpl implements UserDetailsService {
 
     @Transactional
     public void updateById(User user, int id) {
-        User userForUpdate = userRepository.findById(id).orElse(null);
+        User userForUpdate = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));;
         userForUpdate.setSurname(user.getSurname());
         userForUpdate.setUsername(user.getUsername());
-    }
-
-    @Transactional
-    public User findByName(String name) {
-        return userRepository.findByUsername(name).get();
     }
 
     @Transactional
